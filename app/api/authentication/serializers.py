@@ -1,54 +1,88 @@
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import authenticate
+
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
-from django.contrib.auth.password_validation import validate_password
+
+from .models import User
+from ..helpers.serialization_errors import error_dict
 
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
- 
-    @classmethod
-    def get_token(cls, user):
-        token = super(MyTokenObtainPairSerializer, cls).get_token(user)
-
-        # Add custom claims
-        token['username'] = user.username
-        return token
 
 
-class RegisterSerializer(serializers.ModelSerializer):
+class RegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
-            required=True,
-            validators=[UniqueValidator(queryset=User.objects.all())]
+        required=True, 
+        allow_null=False,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message=error_dict['already_exist'].format("Email"),
             )
+        ],
+        error_messages={
+            'required': error_dict['required'],
+        }
+    )
 
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
+    password = serializers.RegexField(
+        regex=("^(?=.{8,}$)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*"),
+        min_length=8,
+        max_length=30,
+        required=True,
+        allow_null=False,
+        write_only=True,
+        error_messages={
+            'required': error_dict['required'],
+            'min_length': error_dict['min_length'].format("Password", "8"),
+            'max_length': 'Password cannot be more than 30 characters',
+            'invalid': error_dict['invalid_password'],
+        }
+    )
+    # Ensure that the first_name does not have a space in between.
+    # Must also contain only letters
+    # with underscores and hyphens allowed password = serializers.RegexField()
+    first_name = serializers.RegexField(
+        regex='^(?!.*\ )[A-Za-z\d\-\_]+$',
+        allow_null=False,
+        required=True,
+        error_messages={
+            'required': error_dict['required'],
+            'invalid': error_dict['invalid_name'].format('First name')
+        }
+    )
+
+    username = serializers.RegexField(
+        regex='^(?!.*\ )[A-Za-z\d\-\_]+$',
+        allow_null=False,
+        required=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message=error_dict['already_exist'].format("Username"),
+            )
+        ],
+        error_messages={
+            'required': error_dict['required'],
+            'invalid': error_dict['invalid_name'].format('Username')
+        }
+    )
+
+    # Ensure that the last_name does not have a space in between.
+    # Must also contain only letters
+    # with underscores and hyphens allowed
+    last_name = serializers.RegexField(
+        regex='^(?!.*\ )[A-Za-z\d\-\_]+$',
+        allow_null=False,
+        required=True,
+        error_messages={
+            'required': error_dict['required'],
+            'invalid': error_dict['invalid_name'].format('Last name')
+        }
+    )
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'password2', 'email', 'first_name', 'last_name')
-        extra_kwargs = {
-            'first_name': {'required': True},
-            'last_name': {'required': True}
-        }
-
-    def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
-
-        return attrs
-
-    def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name']
-        )
-
-        
-        user.set_password(validated_data['password'])
-        user.save()
-
-        return user
+        # List all of the fields that could possibly be included in a request
+        # or response, including fields specified explicitly above.
+        fields = ['first_name', 'last_name','username','email',
+                  'password', ]

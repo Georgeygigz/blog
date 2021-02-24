@@ -11,6 +11,10 @@ djangorestframework = "*"
 psycopg2-binary = "*"
 python-decouple = "*"
 djangorestframework-simplejwt = "*"
+numpy = "*"
+drf-yasg = "*"
+django-rest-swagger = "*"
+pyjwt = "*"
 
 [requires]
 python_version = "3.8"

@@ -1,23 +1,30 @@
+from rest_framework import status
 from rest_framework import generics
-from django.shortcuts import render
-
-# Create your views here.
-
-from .serializers import MyTokenObtainPairSerializer
-from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.views import TokenObtainPairView
-
-from django.contrib.auth.models import User
-from .serializers import RegisterSerializer
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from ..helpers.renderers import RequestJSONRenderer
+from .serializers import RegistrationSerializer
+from ..helpers.constants import SIGNUP_SUCCESS_MESSAGE
+from .models import User
 
 
-
-class MyObtainTokenPairView(TokenObtainPairView):
+class RegistrationAPIView(generics.CreateAPIView):
+    # Allow any user (authenticated or not) to hit this endpoint.
     permission_classes = (AllowAny,)
-    serializer_class = MyTokenObtainPairSerializer
+    renderer_classes = (RequestJSONRenderer,)
+    serializer_class = RegistrationSerializer
 
+    def post(self, request):
+        """
+        Handle user login
+        """
+        user = request.data
 
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    permission_classes = (AllowAny,)
-    serializer_class = RegisterSerializer
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+        data = serializer.data
+
+        return_message = {'message': SIGNUP_SUCCESS_MESSAGE}
+        return Response(return_message, status=status.HTTP_201_CREATED)
