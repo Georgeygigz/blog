@@ -1,10 +1,9 @@
-# My blog
+## My blog
 - This is a web that allows users to:
     - Create Articles,
     - List Articles,
     - Update Articles, 
     - Delete Articles,
-
 ## Requirements
 - [Python 3.8](https://www.python.org/)
 - [Pipenv](https://pypi.org/project/pipenv/)
