@@ -11,7 +11,7 @@ from ..helpers.serialization_errors import error_dict
 
 class RegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
-        required=True, 
+        required=True,
         allow_null=False,
         validators=[
             UniqueValidator(
