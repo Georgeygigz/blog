@@ -86,3 +86,4 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # or response, including fields specified explicitly above.
         fields = ['first_name', 'last_name','username','email',
                   'password', ]
+                  
