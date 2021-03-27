@@ -7,7 +7,9 @@ from django.contrib.auth.models import (
 
 from django.db import models
 from app.api.models import BaseModel
-
+from datetime import datetime, timedelta
+from django.conf import settings
+import jwt
 
 class UserManager(BaseUserManager):
     """
@@ -63,7 +65,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     # Tells Django that the UserManager class defined above should manage
     # objects of this type.
     objects = UserManager()
-    
 
     def __str__(self):
         """
@@ -77,5 +78,17 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         # Use the `create_user` method we wrote earlier to create a new user.
         return User.objects.create_user(**data)
 
+    @property
+    def token(self):
+        """This method generates and returns a string of the token generated.
+        """
+        date = datetime.now() + timedelta(hours=settings.TOKEN_EXP_TIME)
 
-
+        payload = {
+            'email': self.email,
+            'exp': int(date.strftime('%s')),
+            'id': self.id,
+            "username": self.username
+        }
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        return token
