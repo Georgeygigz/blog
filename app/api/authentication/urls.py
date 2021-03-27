@@ -15,7 +15,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from .views import RegistrationAPIView
+from .views import LoginAPIView
+
 
 urlpatterns = [
     path('signup', RegistrationAPIView.as_view(), name='user-registration'),
+    path('login', LoginAPIView.as_view(), name='user-registration')
 ]
