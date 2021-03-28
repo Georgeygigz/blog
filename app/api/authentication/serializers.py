@@ -91,7 +91,7 @@ class LoginSerializer(serializers.Serializer):
     """Login serializer Class"""
 
     email = serializers.CharField(max_length=255)
-    password = serializers.CharField(max_length=128, write_only=True)
+    password = serializers.CharField(max_length=128, write_only=True)#here write_only means that you can't retrieve data.
     token = serializers.CharField(max_length=255, read_only=True)
 
     @staticmethod

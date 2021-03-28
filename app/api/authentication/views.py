@@ -4,12 +4,18 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from datetime import datetime, timedelta
 from ..helpers.renderers import RequestJSONRenderer
 from .serializers import RegistrationSerializer
 from ..helpers.constants import SIGNUP_SUCCESS_MESSAGE
-from .models import User
+from .serializers import (RegistrationSerializer, LoginSerializer)
 from .tasks import send_mail_
+from .models import User
+from ..helpers.token import get_token_data
 from .serializers import LoginSerializer
+from ..helpers.constants import (
+    SIGNUP_SUCCESS_MESSAGE, VERIFICATION_SUCCESS_MSG)
+import jwt
 
 class RegistrationAPIView(generics.CreateAPIView):
     # Allow any user (authenticated or not) to hit this endpoint.
@@ -33,9 +39,21 @@ class RegistrationAPIView(generics.CreateAPIView):
         user_email = data['email']
         first_name = data['first_name']
 
-        domain = settings.VERIFY_URL
 
-        url = domain + str(data['email'])
+        date = datetime.now() + timedelta(hours=settings.TOKEN_EXP_TIME)
+        user = User.objects.get(email=user_email)
+
+        payload = {
+            'email': user_email,
+            'exp': int(date.strftime('%s')),
+            'id': user.id,
+            "username": data['username']
+        }
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+
+
+        domain = settings.VERIFY_URL
+        url = domain + token
 
         body = render_to_string('verify.html', {
             'link': url,
@@ -53,6 +71,25 @@ class RegistrationAPIView(generics.CreateAPIView):
             fail_silently=False,)
         return_message = {'message': SIGNUP_SUCCESS_MESSAGE}
         return Response(return_message, status=status.HTTP_201_CREATED)
+
+
+class VerifyAPIView(generics.RetrieveAPIView):
+    """
+    A class to verify user using the token sent to the email
+    """
+    permission_classes = (AllowAny,)
+    renderer_classes = (RequestJSONRenderer,)
+    @classmethod
+    def get(self, request, token):
+        """
+        Overide the default get method
+        """
+        user = get_token_data(token)
+        user.is_active = True
+        user.save()
+        return Response(data={"message": VERIFICATION_SUCCESS_MSG},
+                        status=status.HTTP_200_OK)
+
 
 class LoginAPIView(generics.CreateAPIView):
     # Login user class
