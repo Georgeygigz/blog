@@ -15,7 +15,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
- 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'app.api.authentication',
+    #'app.api.authentication',
 
     'drf_yasg',
     'rest_framework_swagger',
@@ -147,7 +147,7 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Africa/Nairobi'
-VERIFY_URL = ''
+VERIFY_URL = os.getenv('VERIFY_URL_PROD', '')
 
 
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY', '')
