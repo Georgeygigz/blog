@@ -12,7 +12,7 @@ from ..helpers.serialization_errors import error_dict
 class RegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True,
-        allow_null=False,
+        allow_null=False,# the box for email field should not be empty
         validators=[
             UniqueValidator(
                 queryset=User.objects.all(),
@@ -29,8 +29,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         min_length=8,
         max_length=30,
         required=True,
-        allow_null=False,
-        write_only=True,
+        allow_null=False, #you can't leave this slot empty. if was true, it means  no need for teh required.
+        write_only=True, # write only means you don't copy paste things there.
         error_messages={
             'required': error_dict['required'],
             'min_length': error_dict['min_length'].format("Password", "8"),
