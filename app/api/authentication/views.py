@@ -11,7 +11,7 @@ from ..helpers.renderers import RequestJSONRenderer
 from .serializers import RegistrationSerializer
 from ..helpers.constants import SIGNUP_SUCCESS_MESSAGE
 from .serializers import (RegistrationSerializer, LoginSerializer,
-      UserRetriveUpdateSerializer,UserSearchSerializer, PasswordResetEmailSerializer)
+      UserRetriveUpdateSerializer)
 from .tasks import send_mail_
 from .models import User
 from ..helpers.pagination_helper import Pagination
@@ -141,57 +141,3 @@ class UserRetrieveUpdateAPIView(mixins.RetrieveModelMixin, generics.GenericAPIVi
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-class UsersRetrieveSearchViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    retrieve: Return users.
-    list: Return a list of users
-    """
-    permission_classes = (IsAuthenticated,)
-    queryset = User.objects.filter(
-        deleted=False, is_active=True).order_by('first_name')
-    serializer_class = UserSearchSerializer
-    pagination_class = Pagination
-    filter_backends = (SearchFilter,)
-    search_fields = ('first_name', 'last_name', 'surname',
-                    'email', 'username', 'phone_number',)
-
-    @action(methods=['GET'], detail=False, url_name='Search users')
-    def search(self, request, *args, **kwargs):
-        """
-        Search users
-        """
-        return super().list(request, *args, **kwargs)
-
-
-class PassResetEmailAPIView(generics.CreateAPIView):
-    permission_classes = (AllowAny,)
-    renderer_classes = (RequestJSONRenderer,)
-    serializer_class = PasswordResetEmailSerializer
-
-    def post(self, request):
-        """
-        here, the user provides email to be used to get a link. The email must be registered,
-        token gets generated and sent to users via link.
-        """
-        email = request.data.get('email', {})
-        serializer = self.serializer_class(data={'email': email})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.verify(email)
-        message = "Please reset your password"
-        subject = "Password reset"
-        reset_link = settings.PASS_RESET_URL
-        token = generate_password_reset_token(user.email, user.id)
-        body = render_to_string('password_reset.html', {
-            'link': reset_link + token,
-            'name': user.first_name,
-        })
-
-        send_mail_.delay(
-            subject=subject,
-            message=message,
-            from_email=settings.EMAIL_SENDER,
-            recipient_list=[user.email],
-            html_message=body,
-            fail_silently=False,)
-        return Response({"message": PASS_RESET_MESSAGE}, status=status.HTTP_200_OK)

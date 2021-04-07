@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-    #'app.api.authentication',
+    'app.api.authentication',
 
     'drf_yasg',
     'rest_framework_swagger',
@@ -158,3 +158,5 @@ EMAIL_PORT = os.getenv('EMAIL_PORT', '')
 EMAIL_SENDER = os.getenv('EMAIL_SENDER', '')
 
 TOKEN_EXP_TIME = 24
+PAGE_SIZE = 200
+MAX_PAGE_SIZE = 12
