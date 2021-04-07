@@ -1,20 +1,24 @@
 from django.conf import settings
 from django.template.loader import render_to_string
-from rest_framework import status
-from rest_framework import generics
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework import generics, mixins
 from rest_framework.response import Response
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from datetime import datetime, timedelta
 from ..helpers.renderers import RequestJSONRenderer
 from .serializers import RegistrationSerializer
 from ..helpers.constants import SIGNUP_SUCCESS_MESSAGE
-from .serializers import (RegistrationSerializer, LoginSerializer)
+from .serializers import (RegistrationSerializer, LoginSerializer,
+      UserRetriveUpdateSerializer)
 from .tasks import send_mail_
 from .models import User
-from ..helpers.token import get_token_data
+from ..helpers.pagination_helper import Pagination
+from ..helpers.token import get_token_data, generate_password_reset_token
 from .serializers import LoginSerializer
 from ..helpers.constants import (
-    SIGNUP_SUCCESS_MESSAGE, VERIFICATION_SUCCESS_MSG)
+    SIGNUP_SUCCESS_MESSAGE, VERIFICATION_SUCCESS_MSG, PASS_RESET_MESSAGE)
 import jwt
 
 class RegistrationAPIView(generics.CreateAPIView):
@@ -104,3 +108,36 @@ class LoginAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserRetrieveUpdateAPIView(mixins.RetrieveModelMixin, generics.GenericAPIView):
+    """
+    Class that handles retrieving and updating user info
+    """
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (RequestJSONRenderer,)
+    serializer_class = UserRetriveUpdateSerializer
+
+    def get(self, request, *args, **kwargs):
+        """
+        retrieve user details from the token provided
+        """
+        serializer = self.serializer_class(request.user)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, *args, **kwargs):
+        """
+        overide the default patch() method to enable
+        the user update their details
+        """
+        data = request.data
+
+        serializer = self.serializer_class(
+            request.user, data=data, partial=True)
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
