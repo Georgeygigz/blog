@@ -36,5 +36,6 @@ urlpatterns = [
     url(r'^redoc/$', schema_view_.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     url(r'^docs/$', swagger_ui_view),
     path('users/', include(('app.api.authentication.urls', 'authentication'), namespace='authentication')),
+    path('article/', include(('app.api.article.urls', 'article'), namespace='article')),
 
 ]
