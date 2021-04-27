@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'app.api.authentication',
+    'app.api.article',
 
     'drf_yasg',
     'rest_framework_swagger',
