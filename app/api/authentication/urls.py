@@ -21,7 +21,7 @@ else if using normal functions, use brackets."""
 
 urlpatterns = [
     path('signup', RegistrationAPIView.as_view(), name='user-registration'),
-    path('login', LoginAPIView.as_view(), name='user-registration'),
+    path('login', LoginAPIView.as_view(), name='user-login'),
     path('verify/<str:token>', VerifyAPIView.as_view(), name='user-verification'),
     path('retrieve', UserRetrieveUpdateAPIView.as_view(), name='users-retrieve-search'),
 ]

@@ -24,6 +24,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         }
     )
 
+
     password = serializers.RegexField(
         regex=("^(?=.{8,}$)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*"),
         min_length=8,

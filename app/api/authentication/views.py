@@ -96,7 +96,6 @@ class VerifyAPIView(generics.RetrieveAPIView):
 
 
 class LoginAPIView(generics.CreateAPIView):
-    # Login user class
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
 
