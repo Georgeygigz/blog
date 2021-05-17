@@ -80,15 +80,15 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
     @property
     def token(self):
-        """This method generates and returns a string of the token generated.
-        """
+        #This method generates and returns a string of the token generated.
+
         date = datetime.now() + timedelta(hours=settings.TOKEN_EXP_TIME)
 
         payload = {
             'email': self.email,
             'exp': int(date.strftime('%s')),
             'id': self.id,
-            "username": self.username
+            'username': self.username
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         return token

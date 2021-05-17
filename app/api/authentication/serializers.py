@@ -123,8 +123,8 @@ class LoginSerializer(serializers.Serializer):
         # for a user that matches this email/password combination. Notice how
         # we pass `email` as the `username` value. Remember that, in our User
         # model, we set `USERNAME_FIELD` as `email`.
-
         # user = authenticate(email=email, password=password)
+
         user =  User.objects.filter(email=email, password=password).first()
 
         # If no user was found matching this email/password combination then
@@ -319,4 +319,3 @@ class UserRetriveUpdateSerializer(serializers.ModelSerializer):
         model = User
         exclude = ('last_login', 'is_superuser', 'deleted',
                    'is_active', 'groups', 'user_permissions')
-

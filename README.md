@@ -2,7 +2,7 @@
 - This is a web that allows users to:
     - Create Articles,
     - List Articles,
-    - Update Articles, 
+    - Update Articles,
     - Delete Articles,
 ## Requirements
 - [Python 3.8](https://www.python.org/)
@@ -22,7 +22,7 @@
 - `python manage.py runserver` to start the server
 - Navigate to `http://127.0.0.1:8000` to visit the site
 
-## Sample env 
+## Sample env
 - export DB_NAME=<your_db_name>
 - export DB_USER=<your_db_user>
 - export DB_PASS=<your_db_pass>

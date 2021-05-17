@@ -37,5 +37,5 @@ urlpatterns = [
     url(r'^docs/$', swagger_ui_view),
     path('users/', include(('app.api.authentication.urls', 'authentication'), namespace='authentication')),
     path('article/', include(('app.api.article.urls', 'article'), namespace='article')),
-
+    path('comment/', include(('app.api.comment.urls', 'comment'), namespace='comment')),
 ]
