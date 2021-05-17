@@ -20,7 +20,7 @@ class BaseModel(models.Model):
 
     def save(self,*args, **kwargs): # pylint: disable=W0221
         push_id = PushID()
-        # This to check if it creates a new or updates an old instance
+        # This is to check if it creates a new or updates an old instance
         if not self.id:
             self.id = push_id.next_id()
         super(BaseModel, self).save() # pylint: disable=W0221
