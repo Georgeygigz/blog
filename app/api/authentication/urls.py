@@ -14,7 +14,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import RegistrationAPIView, LoginAPIView, VerifyAPIView, UserRetrieveUpdateAPIView
+from .views import (RegistrationAPIView, LoginAPIView,
+                    ProfileApiView, VerifyAPIView, UserRetrieveUpdateAPIView, RetrieveUserApiView)
+
 
 """when using classes at urlpattern, you always include .as_view() as fucntion,
 else if using normal functions, use brackets."""
@@ -24,4 +26,7 @@ urlpatterns = [
     path('login', LoginAPIView.as_view(), name='user-login'),
     path('verify/<str:token>', VerifyAPIView.as_view(), name='user-verification'),
     path('retrieve', UserRetrieveUpdateAPIView.as_view(), name='users-retrieve-search'),
+    path('profile', ProfileApiView.as_view(), name='users-profile'),
+    path('user/<str:user_id>', RetrieveUserApiView.as_view(), name='user-retrieve'),
+
 ]

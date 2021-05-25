@@ -1,21 +1,18 @@
 from django.conf import settings
 from django.template.loader import render_to_string
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
+from rest_framework import status
 from rest_framework import generics, mixins
 from rest_framework.response import Response
-from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from datetime import datetime, timedelta
 from ..helpers.renderers import RequestJSONRenderer
-from .serializers import RegistrationSerializer
+from .serializers import RegistrationSerializer,RetriveUserSerializer
 from ..helpers.constants import SIGNUP_SUCCESS_MESSAGE
 from .serializers import (RegistrationSerializer, LoginSerializer,
       UserRetriveUpdateSerializer)
 from .tasks import send_mail_
 from .models import User
-from ..helpers.pagination_helper import Pagination
-from ..helpers.token import get_token_data, generate_password_reset_token
+from ..helpers.token import get_token_data
 from .serializers import LoginSerializer
 from ..helpers.constants import (
     SIGNUP_SUCCESS_MESSAGE, VERIFICATION_SUCCESS_MSG, PASS_RESET_MESSAGE)
@@ -77,6 +74,39 @@ class RegistrationAPIView(generics.CreateAPIView):
         return Response(return_message, status=status.HTTP_201_CREATED)
 
 
+
+class ProfileApiView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (RequestJSONRenderer,)
+    serializer_class = RetriveUserSerializer
+
+    def get(self, request):
+        user = request.user
+        user_obj = User.objects.get(pk=user.id)
+        serializer = self.serializer_class(user_obj)
+        data = serializer.data
+        return_message = {
+            "message": "Profile retrieved succesfully",
+            "data":data
+        }
+        return Response(return_message, status=status.HTTP_200_OK)
+
+
+class RetrieveUserApiView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (RequestJSONRenderer,)
+    serializer_class = RegistrationSerializer
+
+    def get(self, request, user_id):
+        user_obj = User.objects.get(pk=user_id)
+        serializer = self.serializer_class(user_obj)
+        return_message = {
+            "message": "Profile retrieved succesfully",
+            "data": serializer.data
+        }
+        return Response(return_message, status=status.HTTP_200_OK)
+
+
 class VerifyAPIView(generics.RetrieveAPIView):
     """
     A class to verify user using the token sent to the email
@@ -95,7 +125,8 @@ class VerifyAPIView(generics.RetrieveAPIView):
                         status=status.HTTP_200_OK)
 
 
-class LoginAPIView(generics.CreateAPIView):
+class LoginAPIView(generics.CreateAPIView):#anyone is allowed to do this(AllowAny)
+    #but to enter in you should give matching details.
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
 
@@ -139,4 +170,3 @@ class UserRetrieveUpdateAPIView(mixins.RetrieveModelMixin, generics.GenericAPIVi
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
