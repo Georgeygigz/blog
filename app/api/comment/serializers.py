@@ -3,8 +3,8 @@ from rest_framework.validators import UniqueValidator
 from .models import Comment
 
 class CommentSerializer(serializers.ModelSerializer):
-    comment = serializers.CharField(required=True, allow_null=False)# the box for email field should not be empty
 
+    comment = serializers.CharField(required=True, allow_null=False)# the box for email field should not be empty
 
     author =  serializers.CharField(read_only=True)
 

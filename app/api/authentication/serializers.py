@@ -1,3 +1,6 @@
+from django.db.models import fields
+from app.api import authentication, models
+from app.api.social.models import Social
 from django.contrib.auth import authenticate
 
 from rest_framework import serializers
@@ -5,6 +8,7 @@ from rest_framework.validators import UniqueValidator
 
 from .models import User
 from ..helpers.serialization_errors import error_dict
+from ..social.serializers import FollowerSerializerRetriever
 
 
 
@@ -198,8 +202,9 @@ class UserRetriveUpdateSerializer(serializers.ModelSerializer):
         }
     )
 
+
     @classmethod
-    def update(self, instance, validated_data):
+    def update(cls, instance, validated_data):
         """Performs an update on a User."""
 
         # Passwords should not be handled with `setattr`, unlike other fields.
@@ -319,3 +324,26 @@ class UserRetriveUpdateSerializer(serializers.ModelSerializer):
         model = User
         exclude = ('last_login', 'is_superuser', 'deleted',
                    'is_active', 'groups', 'user_permissions')
+
+
+class RetriveUserSerializer(serializers.ModelSerializer):
+    followers = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_followers(obj):
+        followers = Social.objects.filter(followee_id=obj.id)
+        serializer = FollowerSerializerRetriever(followers, many=True)
+
+        folls = []
+        for user in  serializer.data:
+            user = list(user.values())[0]
+            # import pdb;pdb.set_trace()
+            user = User.objects.get(email=user)
+            usser = RegistrationSerializer(user)
+            folls.append(usser.data)
+        # return serializer.data
+        return folls
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'username', 'email', 'is_active', 'followers')

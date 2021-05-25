@@ -1,10 +1,10 @@
-from django.shortcuts import render
+
 from rest_framework import status
 from rest_framework import generics, mixins
 from ..helpers.renderers import RequestJSONRenderer
 from .serializers import CommentSerializer,Comment
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from .models import Article
 from rest_framework.serializers import ValidationError
 
@@ -19,6 +19,7 @@ class CreateCommentAPIView(generics.CreateAPIView):
         Handle user creating comments
         """
         comment = request.data
+
 
         serializer = self.serializer_class(data=comment)
         serializer.is_valid(raise_exception=True)
@@ -99,6 +100,6 @@ class EditCommentApiView(mixins.RetrieveModelMixin, generics.GenericAPIView):
 
         return_message = {
             "message":"Comment deleted succefully",
-            "data":serializer.data#shows the comment that is deleted
+            "data":data#shows the comment that is deleted
         }
         return Response(return_message, status=status.HTTP_200_OK)

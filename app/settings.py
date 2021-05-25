@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'app.api.authentication',
     'app.api.article',
     'app.api.comment',
+    'app.api.social',
 
     'drf_yasg',
     'rest_framework_swagger',

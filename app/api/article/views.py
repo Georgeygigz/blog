@@ -10,7 +10,7 @@ from .models import Article
 from rest_framework.serializers import ValidationError
 
 
-# Create your views here.
+
 class CreateArticleAPIView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)#Here user currently authenticated is taken dynamically.
     renderer_classes = (RequestJSONRenderer,)
@@ -30,7 +30,7 @@ class CreateArticleAPIView(generics.CreateAPIView):
         data = serializer.data
         return_message = {
             "message":"Article created successfully",
-            "data":serializer.data
+            "data":data
         }
         return Response(return_message, status=status.HTTP_201_CREATED)
 
@@ -57,11 +57,8 @@ class EditArticleApiView(mixins.RetrieveModelMixin, generics.GenericAPIView):
         data = request.data
         #Now check if the data required has set qualities, using serializer
         serializer = self.serializer_class(article, data, partial=True)
-        # import pdb;pdb.set_trace()
         serializer.is_valid(raise_exception=True)
-
-        serializer.save(author=request.user)
-
+        serializer.save(author=request.user)#currently logged in.
         return_message = {
             "message":"Article updated successfully",
             "data": serializer.data
@@ -82,10 +79,9 @@ class EditArticleApiView(mixins.RetrieveModelMixin, generics.GenericAPIView):
         data = serializer.data#This refers to the instance/object of class(can be accessed thr' serializer.data)
         return_message = {
             "message":"Article retrieved succefully",
-            "data":serializer.data
+            "data":data
         }
         return Response(return_message, status=status.HTTP_200_OK)
-
 
 
 
@@ -103,6 +99,6 @@ class EditArticleApiView(mixins.RetrieveModelMixin, generics.GenericAPIView):
 
         return_message = {
             "message":"Article deleted succefully",
-            "data":serializer.data#shows the article that is deleted
+            "data":data#shows the article that is deleted
         }
         return Response(return_message, status=status.HTTP_200_OK)

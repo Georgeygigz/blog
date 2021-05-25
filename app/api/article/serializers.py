@@ -20,32 +20,23 @@ class ArticleSerializer(serializers.ModelSerializer):
         error_messages={
             'required': error_dict['required'],
         })#serializers have no variable max_length
-    author =  serializers.SerializerMethodField()
+    author =  serializers.CharField(required=True)
     content = serializers.CharField(required=True)
     slug = serializers.CharField(required=True)
 
-
-
-    @staticmethod#This class is created by def get_author(author)is one of the fields like author above
-    def get_author(obj):#method get must bear author.
-        return obj.id
 
     class Meta:
         model = Article#this refers to model class
-        fields = ('title','content','author','status', 'slug')
+        fields = ('title','content','author','status', 'slug', 'created_at')
 
-#This serializer class is used by get at views, where one article is retrieve. We did this to solve the error of
-#list is not collable when we used comment, and because the ArticleSerializer is used by other, creating a new 
-# one would save us fromt he error
+#This serializer class is used by get at views, where one article is retrieved. We did this to solve the error of
+#list is not collable when we used comment, and because the ArticleSerializer is used by other, creating a new
+# one would save us fromt the error.
 class ArticleRetrieverSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(required=True,
-    allow_null=False,# the box for email field will not be empty
-        error_messages={
-            'required': error_dict['required'],
-        })#serializers have no variable max_length
-    content = serializers.CharField(required=True)
-    slug = serializers.CharField(required=True)
-    comments = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()#Add this a new field, to handle comments. Thies will help
+    #retrieve comments tied to their articles.It's a field that was not there initially.This is the way to include it.
+    #Note when hitting any getting endpoint,
+    #====>The fields are those not in models(custom fields/special),
 
 
     #In this case we are retrieving comment for each article post.
