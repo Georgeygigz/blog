@@ -20,7 +20,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         error_messages={
             'required': error_dict['required'],
         })#serializers have no variable max_length
-    author =  serializers.CharField(required=True)
+    author =  serializers.CharField(required=False)
     content = serializers.CharField(required=True)
     slug = serializers.CharField(required=True)
 

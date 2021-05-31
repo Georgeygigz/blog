@@ -120,7 +120,7 @@ class VerifyAPIView(generics.RetrieveAPIView):
         """
         user = get_token_data(token)
         user.is_active = True
-        user.save()
+        usepaylor.save()
         return Response(data={"message": VERIFICATION_SUCCESS_MSG},
                         status=status.HTTP_200_OK)
 
