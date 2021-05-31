@@ -21,9 +21,9 @@ from rest_framework import permissions
 
 schema_view_ = get_schema_view(
     openapi.Info(
-        title="The commuter hub API",
+        title="My Awesome blog",
         default_version='v1',
-        description="Official documentation for the commuter hub API."
+        description="Official documentation for my awesome blog."
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),

@@ -344,6 +344,6 @@ class RetriveUserSerializer(serializers.ModelSerializer):
         # return serializer.data
         return folls
 
-    class Meta:
+    class Meta:#serializers deturmine what is displayed on postman(NOTE)
         model = User
         fields = ('first_name', 'last_name', 'username', 'email', 'is_active', 'followers')

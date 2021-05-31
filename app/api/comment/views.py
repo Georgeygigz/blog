@@ -35,16 +35,6 @@ class CreateCommentAPIView(generics.CreateAPIView):
         return Response(return_message, status=status.HTTP_201_CREATED)
 
 
-    def get(self, request):
-        comment = Comment.objects.all()
-        serializer = self.serializer_class(comment, many=True)
-        return_message = {
-            "message":"comment gotten successfully",
-            "data":serializer.data
-        }
-        return Response(return_message, status=status.HTTP_200_OK)
-
-
 class EditCommentApiView(mixins.RetrieveModelMixin, generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)#Here user currently authenticated is taken dynamically.
     renderer_classes = (RequestJSONRenderer,)#AllowAny here if logged in or not logged in you are allowed to comment.

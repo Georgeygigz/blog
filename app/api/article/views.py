@@ -1,13 +1,12 @@
-from app.api.comment.models import Comment
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework import generics, mixins
 from ..helpers.renderers import RequestJSONRenderer
 from .serializers import ArticleSerializer, ArticleRetrieverSerializer
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from .models import Article
 from rest_framework.serializers import ValidationError
+from .helpers.notifications import send_notifications
 
 
 
@@ -28,8 +27,14 @@ class CreateArticleAPIView(generics.CreateAPIView):
 
         serializer.save(author=request.user)#models will tell you what to put bcz of Foreigh Key r/shp.
         data = serializer.data
+
+        # send notifications
+        # get the author
+        # fetch all the followers
+        send_notifications(request.user)
+
         return_message = {
-            "message":"Article created successfully",
+            "message":"notifications sent successfully",
             "data":data
         }
         return Response(return_message, status=status.HTTP_201_CREATED)
